@@ -22,10 +22,11 @@ MecanumWheel mw;
 pid pid;
 Encoder Encoder;
 
-MD md1(PA_0, PA_4);
-MD md2(PA_1, PA_5);
-MD md3(PA_2, PA_6);
-MD md4(PA_3, PA_7);
+// 制御用ピン(pwmピン,dirピン)
+MD md1(PA_0, PA_4);   //左前
+MD md2(PA_1, PA_5);   //右前
+MD md3(PA_2, PA_6);   //左後ろ
+MD md4(PA_3, PA_7);   //右後ろ
 
 int main() {
 
@@ -72,7 +73,7 @@ int main() {
     double current[4];
 
     // pid.hpp用
-    double feedback_val[4], target_val[4], error_now[4], error_behind[4], integral[4];
+    double _feedback_val[4], _target_val[4], _error_now[4], _error_behind[4], _integral[4];
     double DELTA_T; //積分用周期
 
     serial.add_frame(0, &msc);
@@ -91,12 +92,12 @@ int main() {
         double Lturn = msc.data.l;
         double Rturn = msc.data.r;
 
-        // 目標速度と回転速度の計算
+        // Joystickの制御
         double targetSpeed = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
-        double targetRotation = atan2(msc.data.y, msc.data.x) + PI/2;
+        double targetRotation = atan2(msc.data.y, msc.data.x);
 
 
-        // 目標速度と回転速度を設定
+        // 目標速度,回転速度,回転方向を設定
         mw.control(targetSpeed, targetRotation, Lturn, Rturn);
 
         // 現在の速度の取得（エンコーダー）
@@ -107,7 +108,7 @@ int main() {
         // PID制御
 
         for(int i = 0; i <= 3, i++){
-            pid.control(feedback_val[i], target_val[i], error_now[i], error_behind[i], integral[i], DELTA_T);
+            pid.control(_feedback_val[i], _target_val[i], _error_now[i], _error_behind[i], _integral[i], DELTA_T);
         }
    
         // 10ms待つ

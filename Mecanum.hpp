@@ -22,7 +22,8 @@ private:
 
 
 public:
-    void control(double targetSpeed, double targetRotation, double Lturn, double Rturn) {
+
+void control(double targetSpeed, double targetRotation, double Lturn, double Rturn) {
 
     }
 };

@@ -17,10 +17,8 @@ private:
 
 public:
     pid(double kp, double ki, double kd)
-            : kp(kp), ki(ki), kd(kd)
+        : kp(kp), ki(ki), kd(kd)
 {}
-
-
 
 void control(
     double feedback_val,  // 現在速度
@@ -31,8 +29,6 @@ void control(
     double DELTA_T        // 制御周期
     )
 {
-
-double p, i, d;
 
 error_now = error_behind;
 error_behind = feedback_val – target_val;
