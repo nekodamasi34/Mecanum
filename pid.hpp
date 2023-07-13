@@ -18,7 +18,7 @@ private:
 
 
 public:
-    pid(double kp, double ki, double kd)
+    PID(double kp, double ki, double kd)
         : kp(kp), ki(ki), kd(kd), error_now(0), error_behind(0), integral(0)
 {}
 
@@ -38,6 +38,12 @@ p = kp * error_behind;
 i = ki * integral;
 d = kd * (error_now - error_behind) / DELTA_T;
 
+}
+
+void reset()
+{
+    error_behind = 0;
+    integral = 0;
 }
 
 double get_pid()

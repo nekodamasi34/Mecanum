@@ -1,6 +1,7 @@
 #include "mbed.h"
 #include "math.h"
 #include "Ticker.h"
+#include <chrono>
 
 #include <SerialBridge.hpp>
 #include <MbedHardwareSerial.hpp>
@@ -19,7 +20,7 @@ SerialBridge serial(dev, 1024);
 Controller msc;
 
 MecanumWheel mw;
-pid pid;
+PID pid;
 Encoder Encoder;
 
 // 制御用ピン(pwmピン,dirピン)
@@ -73,7 +74,7 @@ int main() {
     double current[4];
 
     // pid.hpp用
-    double _feedback_val[4], _target_val[4], _error_now[4], _error_behind[4], _integral[4];
+    double _feedback_val[4], _target_val[4];
     double DELTA_T; //積分用周期
 
     serial.add_frame(0, &msc);
@@ -110,12 +111,16 @@ int main() {
         for(int i = 0; i <= 3, i++){
             pid.control(_feedback_val[i], _target_val[i], _error_now[i], _error_behind[i], _integral[i], DELTA_T);
         }
-   
+
         // 10ms待つ
         ThisThread::sleep_for(20ms);
         // do
 
-        FL, FR, RL, RR = 0;
+        FL = 0;
+        FR = 0;
+        RL = 0;
+        RR = 0;
+        
 
         }
         
