@@ -23,6 +23,8 @@ MecanumWheel mw;
 PID pid;
 Encoder Encoder;
 
+// aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
 // 制御用ピン(pwmピン,dirピン)
 MD md1(PA_0, PA_4);   //左前
 MD md2(PA_1, PA_5);   //右前
