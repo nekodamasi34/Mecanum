@@ -3,7 +3,7 @@
 
 #include <mbed.h>
 #include "math.h"
-#include <MD.hpp>
+#include <md.hpp>
 
 class Wheel
 {
