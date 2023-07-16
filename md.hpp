@@ -30,6 +30,4 @@ class MD
         DigitalOut dir;
 };
 
-
-
 #endif

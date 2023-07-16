@@ -8,7 +8,6 @@
 #include "math.h"
 #include "mbed.h"
 
-#include <Dense.h>
 
 class Movement
 {
