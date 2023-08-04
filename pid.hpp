@@ -4,7 +4,7 @@
 #include "mbed.h"
 #include "math.h"
 
-class pid {
+class PID {
 
 private:
     //PID制御
