@@ -14,13 +14,16 @@ class Encoder
         int revolution;
         int count;
         int rotate;
+        double rps;
         double last_angle;
         double last_rotation;
 
+        Timer t;
+
     
     public:
-    Encoder(PinName encoder_a_pin, PinName encoder_b_pin, int revolution) 
-    : encoder_a(encoder_a_pin), encoder_b(encoder_b_pin), revolution(revolution)
+    Encoder(PinName encoder_a_pin, PinName encoder_b_pin) 
+    : encoder_a(encoder_a_pin), encoder_b(encoder_b_pin)
     {
         encoder_a.rise(callback(this, &Encoder::rise_a));
         encoder_b.rise(callback(this, &Encoder::rise_b));
