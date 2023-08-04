@@ -9,61 +9,37 @@
 
 基本的にSerialBridgeを使用しての通信を想定しています。
 
-おびただしい量(15/105)のエラーをはいているのでまだ使えない(7/11現在)
+~~おびただしい量(15/105)のエラーをはいているのでまだ使えない(7/11現在)~~ 修正済み(8/5)
 
 ## 使用方法(デフォルトの値)
 
-### PIDのゲイン
+### 設定項目
 
-    double kpFL = 1.0;
-    double kiFL = 0.1;
-    double kdFL = 0.05;
+// PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
+PID pid_0(1.0, 0.1, 0.05);
+PID pid_1(1.0, 0.1, 0.05);
+PID pid_2(1.0, 0.1, 0.05);
+PID pid_3(1.0, 0.1, 0.05);
 
-    double kpFR = 1.0;
-    double kiFR = 0.1;
-    double kdFR = 0.05;
+// PID用周期調整 (ここを変えるならmainの最後の行も変える)
+double DELTA_T = 0.01;
 
-    double kpRL = 1.0;
-    double kiRL = 0.1;
-    double kdRL = 0.05;
+// エンコーダーの制御ピン (a, b)
+Encoder encoder_0(A0, D0);
+Encoder encoder_1(A1, D1);
+Encoder encoder_2(A2, D2);
+Encoder encoder_3(A3, D3);
 
-    double kpRR = 1.0;
-    double kiRR = 0.1;
-    double kdRR = 0.05;
- 
-### 速度・方向
-
-        // Joystickの値を取得
-        double joyXValue = (msc.data.x - 0.5) * 2;
-        double joyYValue = (msc.data.y - 0.5) * 2;
-
-        // ボタンの状態を取得
-        double Lturn = msc.data.l;
-        double Rturn = msc.data.r;
-
-        // Joystickの制御
-        double targetSpeed = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
-        double targetRotation = atan2(msc.data.y, msc.data.x);
-
-(Joystickを90°回転させて使うが無難)
-
-### 制御ピン(PWM,DIR)
-
-    MD md1(PA_0, PA_4);   //左前
-    MD md2(PA_1, PA_5);   //右前
-    MD md3(PA_2, PA_6);   //左後ろ
-    MD md4(PA_3, PA_7);   //右後ろ
-
-### エンコーダーの制御ピン
-
-    PinName encoder_FL_Pin = A0;
-    PinName encoder_FR_Pin = A1;
-    PinName encoder_RL_Pin = A2;
-    PinName encoder_RR_Pin = A3;
+// MDの制御ピン (pwmピン, dirピン, 逆転モード)
+MD md_0(PA_0, PA_4, 0);
+MD md_1(PA_1, PA_5, 0);
+MD md_2(PA_2, PA_6, 0);
+MD md_3(PA_3, PA_7, 0);
 
 ## 進捗
 
 7/10 pidなど
+8/5 ほぼ完成
 
-+todo メカナム制御・エンコーダー・コントローラー
++todo コントローラー
 
