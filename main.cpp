@@ -1,6 +1,5 @@
 #include "mbed.h"
 #include "math.h"
-#include "Ticker.h"
 #include <chrono>
 
 #include <SerialBridge.hpp>
@@ -20,72 +19,36 @@ SerialBridge serial(dev, 1024);
 Controller msc;
 
 MecanumWheel mw;
-PID pid;
-Encoder Encoder;
 
-// aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+/*
+    [0] --→ 左前　 (FrontLeft)  [FL]
+    [1] --→ 右前　 (FrontRight) [FR]
+    [2] --→ 左後ろ (RearLeft)   [RL]
+    [3] --→ 右後ろ (RearRight)  [RR]
+*/
 
-// 制御用ピン(pwmピン,dirピン)
-MD md1(PA_0, PA_4);   //左前
-MD md2(PA_1, PA_5);   //右前
-MD md3(PA_2, PA_6);   //左後ろ
-MD md4(PA_3, PA_7);   //右後ろ
+// PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
+PID pid_0(1.0, 0.1, 0.05);
+PID pid_1(1.0, 0.1, 0.05);
+PID pid_2(1.0, 0.1, 0.05);
+PID pid_3(1.0, 0.1, 0.05);
+
+// PID用周期調整 (ここを変えるならmainの最後の行も変える)
+double DELTA_T = 0.01;
+
+// エンコーダーの制御ピン (a, b)
+Encoder encoder_0(A0, D0);
+Encoder encoder_1(A1, D1);
+Encoder encoder_2(A2, D2);
+Encoder encoder_3(A3, D3);
+
+// MDの制御ピン (pwmピン, dirピン, 逆転モード)
+MD md_0(PA_0, PA_4, 0);
+MD md_1(PA_1, PA_5, 0);
+MD md_2(PA_2, PA_6, 0);
+MD md_3(PA_3, PA_7, 0);
 
 int main() {
-
-    /*
-        pidの時
-
-        [0] --→ 左前　 (FrontLeft)  [FL]
-        [1] --→ 右前　 (FrontRight) [FR]
-        [2] --→ 左後ろ (RearLeft)   [RL]
-        [3] --→ 右後ろ (RearRight)  [RR]
-
-        pid以外の時
-
-        [0] --→ 左前, 右後ろ (0.3)
-        [1] --→ 右前, 左後ろ (1,2)
-
-    */
-
-    // メカナムホイールの制御ピン
-    PinName FL_Pin = PA_0;
-    PinName FR_Pin = PA_1;
-    PinName RL_Pin = PA_2;
-    PinName RR_Pin = PA_3;
-
-    // エンコーダーの制御ピン
-    PinName encoder_FL_Pin = A0;
-    PinName encoder_FR_Pin = A1;
-    PinName encoder_RL_Pin = A2;
-    PinName encoder_RR_Pin = A3;
-
-    // PID制御ゲイン
-    double kpFL = 1.0;
-    double kiFL = 0.1;
-    double kdFL = 0.05;
-
-    double kpFR = 1.0;
-    double kiFR = 0.1;
-    double kdFR = 0.05;
-
-    double kpRL = 1.0;
-    double kiRL = 0.1;
-    double kdRL = 0.05;
-
-    double kpRR = 1.0;
-    double kiRR = 0.1;
-    double kdRR = 0.05;
-
-    // 途中計算,最終結果用
-    double wheel[4];
-
-    // 現在速度
-    double current[4];
-
-    // pid.hpp用
-    double _feedback_val[4], _target_val[4];
-    double DELTA_T; //積分用周期
 
     serial.add_frame(0, &msc);
 
@@ -95,50 +58,34 @@ int main() {
 
         if(msc.was_updated()){
 
-        // Joystickの値を取得
+        // Joystickの値を取得(値域を±0.5から±1にする)
         double joyXValue = (msc.data.x - 0.5) * 2;
         double joyYValue = (msc.data.y - 0.5) * 2;
 
-        // ボタンの状態を取得
-        double Lturn = msc.data.l;
-        double Rturn = msc.data.r;
+        // ボタンの状態を取得(Lならマイナス,Rならプラス)
+        double LRturn = msc.data.r -  msc.data.l;
 
-        // Joystickの制御
-        double targetSpeed = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
+        // Joystickのベクトル化
+        double targetSpeed    = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
         double targetRotation = atan2(msc.data.y, msc.data.x) + (PI /4);
 
-
-        // 目標速度,回転速度,回転方向を設定
-        mw.control(targetSpeed, targetRotation, Lturn, Rturn);
-
-        wheel[0] = mw.getSpeed_0();
-        wheel[1] = mw.getspeed_1();
-        wheel[2] = mw.getspeed_1();
-        wheel[3] = mw.getspeed_0();
-
-        // 現在の速度の取得（エンコーダー）
-        for(int i = 0; i <= 3, i++){
-            current[i] = 0;
-        }
+        // 目標速度, 回転速度, 回転方向を設定
+        mw.control(targetSpeed, targetRotation, LRturn);
 
         // PID制御
+        pid_0.control(encoder_0.get_rps(), mw.getSpeed_0(), DELTA_T);
+        pid_1.control(encoder_1.get_rps(), mw.getSpeed_1(), DELTA_T);
+        pid_2.control(encoder_2.get_rps(), mw.getSpeed_2(), DELTA_T);
+        pid_3.control(encoder_3.get_rps(), mw.getSpeed_3(), DELTA_T);
 
-        for(int i = 0; i <= 3, i++){
-            pid.control(_feedback_val[i], _target_val[i], _error_now[i], _error_behind[i], _integral[i], DELTA_T);
-        }
+        // MD出力
+        md_0.drive(pid_0.get_pid());
+        md_1.drive(pid_1.get_pid());
+        md_2.drive(pid_2.get_pid());
+        md_3.drive(pid_3.get_pid());
 
-        // 10ms待つ
-        ThisThread::sleep_for(20ms);
-        // do
-
-        FL = 0;
-        FR = 0;
-        RL = 0;
-        RR = 0;
-        
-
-        }
-        
+        // 周期調整用 (ここを変えるならDELTA_Tも変える)
+        ThisThread::sleep_for(10ms);
+        }     
     }
-    
 }
