@@ -8,7 +8,7 @@
 #include <Controller.hpp>
 #include <Encoder.hpp>
 
-#include <mecanum_4.h>
+#include <Mecanum.hpp>
 #include <md.hpp>
 #include <pid.hpp>
 
@@ -34,10 +34,18 @@ MD md4(PA_3, PA_7);   //右後ろ
 int main() {
 
     /*
+        pidの時
+
         [0] --→ 左前　 (FrontLeft)  [FL]
         [1] --→ 右前　 (FrontRight) [FR]
         [2] --→ 左後ろ (RearLeft)   [RL]
         [3] --→ 右後ろ (RearRight)  [RR]
+
+        pid以外の時
+
+        [0] --→ 左前, 右後ろ (0.3)
+        [1] --→ 右前, 左後ろ (1,2)
+
     */
 
     // メカナムホイールの制御ピン
@@ -70,7 +78,7 @@ int main() {
     double kdRR = 0.05;
 
     // 途中計算,最終結果用
-    double roll[4];
+    double wheel[4];
 
     // 現在速度
     double current[4];
@@ -97,11 +105,16 @@ int main() {
 
         // Joystickの制御
         double targetSpeed = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
-        double targetRotation = atan2(msc.data.y, msc.data.x);
+        double targetRotation = atan2(msc.data.y, msc.data.x) + (PI /4);
 
 
         // 目標速度,回転速度,回転方向を設定
         mw.control(targetSpeed, targetRotation, Lturn, Rturn);
+
+        wheel[0] = mw.getSpeed_0();
+        wheel[1] = mw.getspeed_1();
+        wheel[2] = mw.getspeed_1();
+        wheel[3] = mw.getspeed_0();
 
         // 現在の速度の取得（エンコーダー）
         for(int i = 0; i <= 3, i++){
