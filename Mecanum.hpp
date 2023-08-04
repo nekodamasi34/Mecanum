@@ -1,5 +1,5 @@
-#ifndef _MECANUM_H_
-#define _MECANUM_H_
+#ifndef _MECANUM_HPP_
+#define _MECANUM_HPP_
 
 #include "mbed.h"
 #include "math.h"
