@@ -5,8 +5,8 @@
 #include <SerialBridge.hpp>
 #include <MbedHardwareSerial.hpp>
 #include <Controller.hpp>
-#include <Encoder.hpp>
 
+#include <Encoder.hpp>
 #include <Mecanum.hpp>
 #include <md.hpp>
 #include <pid.hpp>
@@ -63,11 +63,15 @@ int main() {
         double joyYValue = (msc.data.y - 0.5) * 2;
 
         // ボタンの状態を取得(Lならマイナス,Rならプラス)
-        double LRturn = msc.data.r -  msc.data.l;
+        double LRturn = msc.data.r - msc.data.l;
 
         // Joystickのベクトル化
         double targetSpeed    = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
-        double targetRotation = atan2(msc.data.y, msc.data.x) + (PI /4);
+        double targetRotation = atan2(msc.data.y, msc.data.x) - (PI /4);
+
+        if(targetRotation < 0){
+            targetRotation += (2 * PI);
+        }
 
         // 目標速度, 回転速度, 回転方向を設定
         mw.control(targetSpeed, targetRotation, LRturn);
