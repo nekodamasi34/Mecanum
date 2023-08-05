@@ -77,10 +77,10 @@ int main() {
         mw.control(targetSpeed, targetRotation, LRturn);
 
         // PID制御
-        pid_0.control(encoder_0.get_rps(), mw.getSpeed_0(), DELTA_T);
-        pid_1.control(encoder_1.get_rps(), mw.getSpeed_1(), DELTA_T);
-        pid_2.control(encoder_2.get_rps(), mw.getSpeed_2(), DELTA_T);
-        pid_3.control(encoder_3.get_rps(), mw.getSpeed_3(), DELTA_T);
+        pid_0.control(encoder_0.get_rps(), mw.getSpeed(0), DELTA_T);
+        pid_1.control(encoder_1.get_rps(), mw.getSpeed(1), DELTA_T);
+        pid_2.control(encoder_2.get_rps(), mw.getSpeed(2), DELTA_T);
+        pid_3.control(encoder_3.get_rps(), mw.getSpeed(3), DELTA_T);
 
         // MD出力
         md_0.drive(pid_0.get_pid());
