@@ -29,15 +29,14 @@ void control(
     )
 {
 
-error_behind = error_now;
-error_now = feedback_val – target_val;
+    error_behind = error_now;
+    error_now = feedback_val – target_val;
 
-integral += (error_behind + error_now) / 2.0 * DELTA_T;
+    integral += (error_behind + error_now) / 2.0 * DELTA_T;
 
-p = kp * error_behind;
-i = ki * integral;
-d = kd * (error_now - error_behind) / DELTA_T;
-
+    p = kp * error_behind;
+    i = ki * integral;
+    d = kd * (error_now - error_behind) / DELTA_T;
 }
 
 void reset()
