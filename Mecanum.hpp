@@ -23,20 +23,11 @@ public:
         wheel[3] = sin(_targetRotation) / cos(_targetRotation) * _targetSpeed + _targetRotation;
     }
 
-    double getSpeed_0(){
-        return wheel[0];
-    }
-
-    double getSpeed_1(){
-        return wheel[1];
-    }
-
-    double getSpeed_2(){
-        return wheel[2];
-    }
-
-    double getSpeed_3(){
-        return wheel[3];
+    double getSpeed(int unit) {
+        if(unit < 0 || unit > 3) {
+            return 0.0;
+        }
+        return wheel[unit];
     }
 };
 
