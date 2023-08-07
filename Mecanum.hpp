@@ -12,8 +12,8 @@ private:
 
 public:
 
-    MecanumWheel() : 
-    {}
+    MecanumWheel()
+    {};
 
     void control(double _targetSpeed, double _targetRotation, double _LRturn)
     {

@@ -2,18 +2,18 @@
 #include "math.h"
 #include <chrono>
 
-#include <SerialBridge.hpp>
-#include <MbedHardwareSerial.hpp>
-#include <Controller.hpp>
+#include "MbedHardwareSerial.hpp"
+#include "SerialBridge.hpp"
+#include "Controller.hpp"
 
-#include <Encoder.hpp>
-#include <Mecanum.hpp>
-#include <md.hpp>
-#include <pid.hpp>
+#include "Encoder.hpp"
+#include "Mecanum.hpp"
+#include "md.hpp"
+#include "pid.hpp"
 
 const double PI = 3.141592653589;
 
-SerialDev *dev = new MbedHardwareSerial(new Serial(D5, D4, 115200));
+SerialDev *dev = new MbedHardwareSerial(new BufferedSerial(D5, D4, 115200));
 SerialBridge serial(dev, 1024);
 
 Controller msc;
@@ -27,34 +27,15 @@ MecanumWheel mw;
     [3] --→ 右後ろ (RearRight)  [RR]
 */
 
-// PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
-PID pid[4] = {
-    PID(1.0, 0.1, 0.05),
-    PID(1.0, 0.1, 0.05),
-    PID(1.0, 0.1, 0.05),
-    PID(1.0, 0.1, 0.05)
-};
+// 呼び出し
+Encoder *encoder[4];
+PID *PID[4];
+MD *md[4];
 
-// PID用周期調整 (ここを変えるならmainの最後の行も変える)
-double DELTA_T = 0.01;
-
-// エンコーダーの制御ピン (a, b)
-Encoder encoder[4] = {
-    Encoder(A0, D0),
-    Encoder(A1, D1),
-    Encoder(A2, D2),
-    Encoder(A3, D3)
-};
-
-// MDの制御ピン (pwmピン, dirピン, 逆転モード)
-MD md[4] = {
-    MD(PA_0, PA_4, 0),
-    MD(PA_1, PA_5, 0),
-    MD(PA_2, PA_6, 0),
-    MD(PA_3, PA_7, 0),
-};
+void initialize_module();
 
 int main() {
+    initialize_module();
 
     serial.add_frame(0, &msc);
 
@@ -83,19 +64,46 @@ int main() {
         mw.control(targetSpeed, targetRotation, LRturn);
 
         // PID制御
-        pid[0].control(encoder[0].get_rps(), mw.getSpeed(0), DELTA_T);
-        pid[1].control(encoder[1].get_rps(), mw.getSpeed(1), DELTA_T);
-        pid[2].control(encoder[2].get_rps(), mw.getSpeed(2), DELTA_T);
-        pid[3].control(encoder[3].get_rps(), mw.getSpeed(3), DELTA_T);
+        pid[0].control(encoder[0]->get_rps(), mw.getSpeed(0), DELTA_T);
+        pid[1].control(encoder[1]->get_rps(), mw.getSpeed(1), DELTA_T);
+        pid[2].control(encoder[2]->get_rps(), mw.getSpeed(2), DELTA_T);
+        pid[3].control(encoder[3]->get_rps(), mw.getSpeed(3), DELTA_T);
 
         // MD出力
-        md[0].drive(pid[0].get_pid());
-        md[1].drive(pid[1].get_pid());
-        md[2].drive(pid[2].get_pid());
-        md[3].drive(pid[3].get_pid());
+        md[0]->drive(pid[0].get_pid());
+        md[1]->drive(pid[1].get_pid());
+        md[2]->drive(pid[2].get_pid());
+        md[3]->drive(pid[3].get_pid());
 
         // 周期調整用 (ここを変えるならDELTA_Tも変える)
         ThisThread::sleep_for(10ms);
         }     
     }
 }
+
+void initialize_module()
+{
+
+// PID用周期調整 (ここを変えるならmainの最後の行も変える)
+    double DELTA_T = 0.01;
+// PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
+    PID[0] = new PID(1.0, 0.1, 0.05);
+    PID[1] = new PID(1.0, 0.1, 0.05);
+    PID[2] = new PID(1.0, 0.1, 0.05);
+    PID[3] = new PID(1.0, 0.1, 0.05);
+
+// エンコーダーの制御ピン (a, b)
+    encoder[0] = new Encoder(A0, D0);
+    encoder[1] = new Encoder(A1, D1);
+    encoder[2] = new Encoder(A2, D2);
+    encoder[3] = new Encoder(A3, D3);
+
+
+// MDの制御ピン (pwmピン, dirピン, 逆転モード)
+    md[0] = new MD(PA_0, PA_4, 0);
+    md[1] = new MD(PA_1, PA_5, 0);
+    md[2] = new MD(PA_2, PA_6, 0);
+    md[3] = new MD(PA_3, PA_7, 0);
+
+}
+

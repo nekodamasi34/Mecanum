@@ -30,7 +30,7 @@ void control(
 {
 
     error_behind = error_now;
-    error_now = feedback_val – target_val;
+    error_now = feedback_val - target_val;
 
     integral += (error_behind + error_now) / 2.0 * DELTA_T;
 

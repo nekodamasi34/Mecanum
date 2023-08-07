@@ -20,21 +20,6 @@ class Encoder
 
         Timer t;
 
-    
-    public:
-    Encoder(PinName encoder_a_pin, PinName encoder_b_pin) 
-    : encoder_a(encoder_a_pin), encoder_b(encoder_b_pin)
-    {
-        encoder_a.rise(callback(this, &Encoder::rise_a));
-        encoder_b.rise(callback(this, &Encoder::rise_b));
-        encoder_a.fall(callback(this, &Encoder::fall_a));
-        encoder_b.fall(callback(this, &Encoder::fall_b));
-    };
-
-
-    
-
-
     void rise_a()
     {
         if(encoder_b.read()){
@@ -79,6 +64,19 @@ class Encoder
         };        
     }
 
+
+
+    
+    public:
+    Encoder(PinName encoder_a_pin, PinName encoder_b_pin) 
+    : encoder_a(encoder_a_pin), encoder_b(encoder_b_pin)
+    {
+        encoder_a.rise(callback(this, &Encoder::rise_a));
+        encoder_b.rise(callback(this, &Encoder::rise_b));
+        encoder_a.fall(callback(this, &Encoder::fall_a));
+        encoder_b.fall(callback(this, &Encoder::fall_b));
+    };
+
     double get_rotation()
     {
         return (double)count/1296;
@@ -97,7 +95,7 @@ class Encoder
 
     double get_rps()
     {
-        rps = ( get_rotation() - last_rotation ) / (double)t;
+        rps = ( get_rotation() - last_rotation ) / (double)t.read();
 
     
         t.reset();
@@ -106,9 +104,7 @@ class Encoder
 
         return (double)rps;
     }
-
-
-
+    
 
 };
 
