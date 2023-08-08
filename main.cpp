@@ -15,7 +15,6 @@ const double PI = 3.141592653589;
 
 SerialDev *dev = new MbedHardwareSerial(new BufferedSerial(D5, D4, 115200));
 SerialBridge serial(dev, 1024);
-
 Controller msc;
 
 MecanumWheel mw;
@@ -64,16 +63,16 @@ int main() {
         mw.control(targetSpeed, targetRotation, LRturn);
 
         // PID制御
-        pid[0].control(encoder[0]->get_rps(), mw.getSpeed(0), DELTA_T);
-        pid[1].control(encoder[1]->get_rps(), mw.getSpeed(1), DELTA_T);
-        pid[2].control(encoder[2]->get_rps(), mw.getSpeed(2), DELTA_T);
-        pid[3].control(encoder[3]->get_rps(), mw.getSpeed(3), DELTA_T);
+        pid[0]->control(encoder[0]->get_rps(), mw.getSpeed(0), DELTA_T);
+        pid[1]->control(encoder[1]->get_rps(), mw.getSpeed(1), DELTA_T);
+        pid[2]->control(encoder[2]->get_rps(), mw.getSpeed(2), DELTA_T);
+        pid[3]->control(encoder[3]->get_rps(), mw.getSpeed(3), DELTA_T);
 
         // MD出力
-        md[0]->drive(pid[0].get_pid());
-        md[1]->drive(pid[1].get_pid());
-        md[2]->drive(pid[2].get_pid());
-        md[3]->drive(pid[3].get_pid());
+        md[0]->drive(pid[0]->get_pid());
+        md[1]->drive(pid[1]->get_pid());
+        md[2]->drive(pid[2]->get_pid());
+        md[3]->drive(pid[3]->get_pid());
 
         // 周期調整用 (ここを変えるならDELTA_Tも変える)
         ThisThread::sleep_for(10ms);

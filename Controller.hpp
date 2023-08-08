@@ -9,6 +9,7 @@ typedef struct ControllerType
     double y;  //y軸 
     bool l;    //左回転モード
     bool r;    //右回転モード
+    bool a, b, c; //ボタン
 } controller_t;
 
 //  create message
