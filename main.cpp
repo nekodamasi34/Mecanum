@@ -79,6 +79,7 @@ int main() {
 
         // 周期調整用 (ここを変えるならDELTA_Tも変える)
         ThisThread::sleep_for(10ms);
+
         }     
     }
 }
