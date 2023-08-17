@@ -13,7 +13,7 @@
 
 const double PI = 3.141592653589;
 
-SerialDev *dev = new MbedHardwareSerial(new BufferedSerial(D5, D4, 115200));
+SerialDev *dev = new MbedHardwareSerial(new BufferedSerial(PA_15, PB_7, 115200));
 SerialBridge serial(dev, 1024);
 Controller msc;
 
@@ -28,8 +28,11 @@ MecanumWheel mw;
 
 // 呼び出し
 Encoder *encoder[4];
-PID *PID[4];
+PID *pid[4];
 MD *md[4];
+
+// PID用周期調整 (ここを変えるならmainの最後の行も変える)
+const double DELTA_T = 0.01;
 
 void initialize_module();
 
@@ -82,15 +85,11 @@ int main() {
 
 void initialize_module()
 {
-
-// PID用周期調整 (ここを変えるならmainの最後の行も変える)
-    double DELTA_T = 0.01;
-
 // PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
-    PID[0] = new PID(1.0, 0.1, 0.05);
-    PID[1] = new PID(1.0, 0.1, 0.05);
-    PID[2] = new PID(1.0, 0.1, 0.05);
-    PID[3] = new PID(1.0, 0.1, 0.05);
+    pid[0] = new PID(1.0, 0.1, 0.05);
+    pid[1] = new PID(1.0, 0.1, 0.05);
+    pid[2] = new PID(1.0, 0.1, 0.05);
+    pid[3] = new PID(1.0, 0.1, 0.05);
 
 // エンコーダーの制御ピン (a, b)
     encoder[0] = new Encoder(PB_2, PA_11);
@@ -99,7 +98,7 @@ void initialize_module()
     encoder[3] = new Encoder(PB_6, PC_9);
 
 // MDの制御ピン (pwmピン, dirピン, 逆転モード)
-    md[0] = new MD(PA_10, PD_2,  0);
+    md[0] = new MD(PA_10, PB_2,  0);
     md[1] = new MD(PB_3 , PC_11, 0);
     md[2] = new MD(PB_5 , PC_10, 0);
     md[3] = new MD(PB_4 , PC_12, 0);
