@@ -95,8 +95,8 @@ void initialize_module()
 // エンコーダーの制御ピン (a, b)
     encoder[0] = new Encoder(PB_2, PA_11);
     encoder[1] = new Encoder(PC_5, PA_12);
-    encoder[2] = new Encoder(PC_6, PC_8);
-    encoder[3] = new Encoder(PB_6, PC_9);
+    encoder[2] = new Encoder(PB_1, PC_8);
+    encoder[3] = new Encoder(PA_6, PC_9);
 
 // MDの制御ピン (pwmピン, dirピン, 逆転モード)
     md[0] = new MD(PA_10, PB_2,  0);
