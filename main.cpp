@@ -85,6 +85,7 @@ void initialize_module()
 
 // PID用周期調整 (ここを変えるならmainの最後の行も変える)
     double DELTA_T = 0.01;
+
 // PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
     PID[0] = new PID(1.0, 0.1, 0.05);
     PID[1] = new PID(1.0, 0.1, 0.05);
@@ -92,17 +93,16 @@ void initialize_module()
     PID[3] = new PID(1.0, 0.1, 0.05);
 
 // エンコーダーの制御ピン (a, b)
-    encoder[0] = new Encoder(A0, D0);
-    encoder[1] = new Encoder(A1, D1);
-    encoder[2] = new Encoder(A2, D2);
-    encoder[3] = new Encoder(A3, D3);
-
+    encoder[0] = new Encoder(PB_2, PA_11);
+    encoder[1] = new Encoder(PC_5, PA_12);
+    encoder[2] = new Encoder(PC_6, PC_8);
+    encoder[3] = new Encoder(PB_6, PC_9);
 
 // MDの制御ピン (pwmピン, dirピン, 逆転モード)
-    md[0] = new MD(PA_0, PA_4, 0);
-    md[1] = new MD(PA_1, PA_5, 0);
-    md[2] = new MD(PA_2, PA_6, 0);
-    md[3] = new MD(PA_3, PA_7, 0);
+    md[0] = new MD(PA_10, PD_2,  0);
+    md[1] = new MD(PB_3 , PC_11, 0);
+    md[2] = new MD(PB_5 , PC_10, 0);
+    md[3] = new MD(PB_4 , PC_12, 0);
 
 }
 
