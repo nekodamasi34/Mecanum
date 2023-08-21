@@ -47,23 +47,24 @@ int main() {
 
         if(msc.was_updated()){
 
-
-
             // Joystickの値を取得(値域を±0.5から±1にする)
             double joyXValue = (msc.data.x - 0.5) * 2;
             double joyYValue = (msc.data.y - 0.5) * 2;
 
             // ボタンの状態を取得(Lならマイナス,Rならプラス)
-            double LRturn = msc.data.r - msc.data.l;
+            double turn = msc.data.r - msc.data.l;
 
             // Joystickのベクトル化
             double targetSpeed    = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
             double targetRotation = atan2(msc.data.y, msc.data.x) - (PI /4);
 
-            // targetSpeedが1を超えないようにする
+            // targetSpeedが1,-1を超えないようにする
             if(targetSpeed > 1){
                 targetSpeed = 1;
+            }else if (targetSpeed < -1) {
+                targetSpeed = -1;
             }
+
 
             // targetRotationがマイナスにならないように2πたす
             if(targetRotation < 0){
@@ -71,22 +72,32 @@ int main() {
             }
 
             // 目標速度, 回転速度, 回転方向を設定
-            mw.control(targetSpeed, targetRotation, LRturn);
+            mw.control(targetSpeed, targetRotation, turn);
 
+            /*
             // PID制御
             pid[0]->control(encoder[0]->get_rps(), mw.getSpeed(0), DELTA_T);
             pid[1]->control(encoder[1]->get_rps(), mw.getSpeed(1), DELTA_T);
             pid[2]->control(encoder[2]->get_rps(), mw.getSpeed(2), DELTA_T);
             pid[3]->control(encoder[3]->get_rps(), mw.getSpeed(3), DELTA_T);
 
+
             // MD出力
             md[0]->drive(pid[0]->get_pid());
             md[1]->drive(pid[1]->get_pid());
             md[2]->drive(pid[2]->get_pid());
             md[3]->drive(pid[3]->get_pid());
+            */
+
+            printf("[0] = %.4lf [1] = %.4lf [2] = %.4lf [3] = %.4lf\n\r",mw.getSpeed(0),mw.getSpeed(1),mw.getSpeed(2),mw.getSpeed(3));
+
+            md[0]->drive(mw.getSpeed(0));
+            md[1]->drive(mw.getSpeed(1));
+            md[2]->drive(mw.getSpeed(2));
+            md[3]->drive(mw.getSpeed(3));
 
             // 周期調整用 (ここを変えるならDELTA_Tも変える)
-            ThisThread::sleep_for(10ms);
+            // ThisThread::sleep_for(10ms);
 
 
 
@@ -109,10 +120,10 @@ void initialize_module()
     encoder[3] = new Encoder(PA_6, PC_9);
 
 // MDの制御ピン (pwmピン, dirピン, 逆転モード)
-    md[0] = new MD(PA_10, PB_2,  0);
-    md[1] = new MD(PB_3 , PC_11, 0);
+    md[0] = new MD(PA_10, PD_2,  0);
+    md[1] = new MD(PB_3 , PC_11, 1);
     md[2] = new MD(PB_5 , PC_10, 0);
-    md[3] = new MD(PB_4 , PC_12, 0);
+    md[3] = new MD(PB_4 , PC_12, 1);
 
 }
 

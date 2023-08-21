@@ -15,12 +15,22 @@ public:
     MecanumWheel()
     {};
 
-    void control(double _targetSpeed, double _targetRotation, double _LRturn)
+/*
+    void control(double _targetSpeed, double _targetRotation, double _turn)
     {
-        _wheel[0] = sin(_targetRotation) / cos(_targetRotation) * _targetSpeed - _targetRotation;
-        _wheel[1] = cos(_targetRotation) / sin(_targetRotation) * _targetSpeed + _targetRotation;
-        _wheel[2] = cos(_targetRotation) / sin(_targetRotation) * _targetSpeed - _targetRotation;
-        _wheel[3] = sin(_targetRotation) / cos(_targetRotation) * _targetSpeed + _targetRotation;
+        _wheel[0] = cos(_targetRotation) * _targetSpeed - _turn;
+        _wheel[1] = sin(_targetRotation) * _targetSpeed + _turn;
+        _wheel[2] = sin(_targetRotation) * _targetSpeed - _turn;
+        _wheel[3] = cos(_targetRotation) * _targetSpeed + _turn;
+    }
+*/
+
+    void control(double _targetSpeed, double _targetRotation, double _turn)
+    {
+        _wheel[0] = cos(_targetRotation) * _targetSpeed;
+        _wheel[1] = sin(_targetRotation) * _targetSpeed;
+        _wheel[2] = sin(_targetRotation) * _targetSpeed;
+        _wheel[3] = cos(_targetRotation) * _targetSpeed;
     }
 
     double getSpeed(int unit) {
