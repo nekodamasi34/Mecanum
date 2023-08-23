@@ -7,18 +7,20 @@
 
 class Encoder
 {
-    private:
-        InterruptIn encoder_a;
-        InterruptIn encoder_b;
+private:
+    InterruptIn encoder_a;
+    InterruptIn encoder_b;
 
-        int revolution;
-        int count;
-        int rotate;
-        double rps;
-        double last_angle;
-        double last_rotation;
+    int revolution;
+    int count;
+    int rotate;
+    double rps;
+    double last_angle;
+    double last_rotation;
 
-        Timer t;
+    Timer t;
+
+
 
     void rise_a()
     {
@@ -28,7 +30,7 @@ class Encoder
         }else if(encoder_b.read()){
             count--;
             rotate = 1;
-        };        
+        };
     }
 
     void rise_b()
@@ -39,7 +41,7 @@ class Encoder
         }else if(encoder_b.read()){
             count--;
             rotate = 1;
-        };        
+        };
     }
 
     void fall_a()
@@ -50,7 +52,7 @@ class Encoder
         }else if(encoder_b.read()){
             count--;
             rotate = 1;
-        };        
+        };
     }
 
     void fall_b()
@@ -61,20 +63,21 @@ class Encoder
         }else if(encoder_a.read()){
             count--;
             rotate = 1;
-        };        
+        };
     }
 
 
 
-    
-    public:
-    Encoder(PinName encoder_a_pin, PinName encoder_b_pin) 
-    : encoder_a(encoder_a_pin), encoder_b(encoder_b_pin)
+
+public:
+    Encoder(PinName encoder_a_pin, PinName encoder_b_pin)
+            : encoder_a(encoder_a_pin), encoder_b(encoder_b_pin)
     {
         encoder_a.rise(callback(this, &Encoder::rise_a));
         encoder_b.rise(callback(this, &Encoder::rise_b));
         encoder_a.fall(callback(this, &Encoder::fall_a));
         encoder_b.fall(callback(this, &Encoder::fall_b));
+        t.start();
     };
 
     double get_rotation()
@@ -97,14 +100,14 @@ class Encoder
     {
         rps = ( get_rotation() - last_rotation ) / (double)t.read();
 
-    
+
         t.reset();
-    
+
         last_rotation = get_rotation();
 
         return (double)rps;
     }
-    
+
 
 };
 

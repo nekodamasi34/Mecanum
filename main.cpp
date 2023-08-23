@@ -19,6 +19,9 @@ Controller msc;
 
 MecanumWheel mw;
 
+Timer timer;
+double pre_timer = 0.01;
+
 /*
     [0] --→ 左前　 (FrontLeft)  [FL]
     [1] --→ 右前　 (FrontRight) [FR]
@@ -31,8 +34,8 @@ Encoder *encoder[4];
 PID *pid[4];
 MD *md[4];
 
-// PID用周期調整 (ここを変えるならmainの最後の行も変える)
-const double DELTA_T = 0.01;
+
+
 
 void initialize_module();
 
@@ -41,22 +44,42 @@ int main() {
 
     serial.add_frame(0, &msc);
 
+    timer.start();
+
     while (1) {
 
         serial.update();
 
+
+
         if(msc.was_updated()){
+
+
+            // PID用周期調整
+            double DELTA_T = timer.read() - pre_timer;
 
             // Joystickの値を取得(値域を±0.5から±1にする)
             double joyXValue = (msc.data.x - 0.5) * 2;
             double joyYValue = (msc.data.y - 0.5) * 2;
 
+            if(joyXValue < 0.1 && joyXValue > -0.1){
+                joyXValue = 0;
+            }
+
+            if(joyYValue < 0.1 && joyYValue > -0.1){
+                joyYValue = 0;
+            }
+
             // ボタンの状態を取得(Lならマイナス,Rならプラス)
-            double turn = msc.data.r - msc.data.l;
+            double turn = (msc.data.r * 0.3) - (msc.data.l * 0.3);
+
+            if(msc.data.n == 1){
+                turn = msc.data.r - msc.data.l;
+            }
 
             // Joystickのベクトル化
             double targetSpeed    = sqrt(joyXValue * joyXValue + joyYValue * joyYValue);
-            double targetRotation = atan2(msc.data.y, msc.data.x) - (PI /4);
+            double targetRotation = atan2(joyYValue, joyXValue) - (PI /4);
 
             // targetSpeedが1,-1を超えないようにする
             if(targetSpeed > 1){
@@ -65,6 +88,11 @@ int main() {
                 targetSpeed = -1;
             }
 
+            // targetSpeedが0.1以下の時に起動しないようにする
+
+            if(targetSpeed < 0.1 && targetSpeed > -0.1){
+                targetSpeed = 0;
+            }
 
             // targetRotationがマイナスにならないように2πたす
             if(targetRotation < 0){
@@ -74,30 +102,37 @@ int main() {
             // 目標速度, 回転速度, 回転方向を設定
             mw.control(targetSpeed, targetRotation, turn);
 
-            /*
+
             // PID制御
             pid[0]->control(encoder[0]->get_rps(), mw.getSpeed(0), DELTA_T);
             pid[1]->control(encoder[1]->get_rps(), mw.getSpeed(1), DELTA_T);
             pid[2]->control(encoder[2]->get_rps(), mw.getSpeed(2), DELTA_T);
             pid[3]->control(encoder[3]->get_rps(), mw.getSpeed(3), DELTA_T);
 
+            // printf("1 = %.4lf 2 = %.4lf 3 = %.4lf 4 = %.4lf",encoder[0]->get_rps(),encoder[1]->get_rps(),encoder[2]->get_rps(),encoder[3]->get_rps());
+
+            printf("fl = %.3lf fr = %.3lf rl = %.3lf rr = %.3lf\n\r",pid[0]->get_pid(),pid[1]->get_pid(),pid[2]->get_pid(),pid[3]->get_pid());
 
             // MD出力
             md[0]->drive(pid[0]->get_pid());
             md[1]->drive(pid[1]->get_pid());
             md[2]->drive(pid[2]->get_pid());
             md[3]->drive(pid[3]->get_pid());
-            */
 
-            printf("[0] = %.4lf [1] = %.4lf [2] = %.4lf [3] = %.4lf\n\r",mw.getSpeed(0),mw.getSpeed(1),mw.getSpeed(2),mw.getSpeed(3));
 
+
+
+            /*
             md[0]->drive(mw.getSpeed(0));
             md[1]->drive(mw.getSpeed(1));
             md[2]->drive(mw.getSpeed(2));
             md[3]->drive(mw.getSpeed(3));
+            */
+
+            pre_timer = (double)timer.read();
 
             // 周期調整用 (ここを変えるならDELTA_Tも変える)
-            // ThisThread::sleep_for(10ms);
+            ThisThread::sleep_for(10ms);
 
 
 
@@ -108,10 +143,10 @@ int main() {
 void initialize_module()
 {
 // PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
-    pid[0] = new PID(1.0, 0.1, 0.05);
-    pid[1] = new PID(1.0, 0.1, 0.05);
-    pid[2] = new PID(1.0, 0.1, 0.05);
-    pid[3] = new PID(1.0, 0.1, 0.05);
+    pid[0] = new PID(1.1, 0, 0);
+    pid[1] = new PID(1.1, 0, 0);
+    pid[2] = new PID(1.1, 0, 0);
+    pid[3] = new PID(1.1, 0, 0);
 
 // エンコーダーの制御ピン (a, b)
     encoder[0] = new Encoder(PB_2, PA_11);

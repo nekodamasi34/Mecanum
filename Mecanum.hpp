@@ -15,7 +15,7 @@ public:
     MecanumWheel()
     {};
 
-/*
+
     void control(double _targetSpeed, double _targetRotation, double _turn)
     {
         _wheel[0] = cos(_targetRotation) * _targetSpeed - _turn;
@@ -23,15 +23,7 @@ public:
         _wheel[2] = sin(_targetRotation) * _targetSpeed - _turn;
         _wheel[3] = cos(_targetRotation) * _targetSpeed + _turn;
     }
-*/
 
-    void control(double _targetSpeed, double _targetRotation, double _turn)
-    {
-        _wheel[0] = cos(_targetRotation) * _targetSpeed;
-        _wheel[1] = sin(_targetRotation) * _targetSpeed;
-        _wheel[2] = sin(_targetRotation) * _targetSpeed;
-        _wheel[3] = cos(_targetRotation) * _targetSpeed;
-    }
 
     double getSpeed(int unit) {
         if(unit < 0 || unit > 3) {

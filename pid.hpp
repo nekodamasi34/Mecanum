@@ -19,36 +19,36 @@ private:
 
 public:
     PID(double kp, double ki, double kd)
-        : kp(kp), ki(ki), kd(kd), error_now(0), error_behind(0), integral(0)
-{}
+            : kp(kp), ki(ki), kd(kd), error_now(0), error_behind(0), integral(0)
+    {}
 
-void control(
-    double feedback_val,  // 現在速度
-    double target_val,    // 目標速度
-    double DELTA_T        // 制御周期
+    void control(
+            double feedback_val,  // 現在速度
+            double target_val,    // 目標速度
+            double DELTA_T        // 制御周期
     )
-{
+    {
 
-    error_behind = error_now;
-    error_now = feedback_val - target_val;
+        error_behind = error_now;
+        error_now = feedback_val - target_val;
 
-    integral += (error_behind + error_now) / 2.0 * DELTA_T;
+        integral += (error_behind + error_now) / 2.0 * DELTA_T;
 
-    p = kp * error_behind;
-    i = ki * integral;
-    d = kd * (error_now - error_behind) / DELTA_T;
-}
+        p = kp * error_behind;
+        i = ki * integral;
+        d = kd * (error_now - error_behind) / DELTA_T;
+    }
 
-void reset()
-{
-    error_behind = 0;
-    integral = 0;
-}
+    void reset()
+    {
+        error_behind = 0;
+        integral = 0;
+    }
 
-double get_pid()
-{
-    return (p + i + d);
-}
+    double get_pid()
+    {
+        return (p + i + d);
+    }
 
 
 };
