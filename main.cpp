@@ -111,13 +111,15 @@ int main() {
 
             // printf("1 = %.4lf 2 = %.4lf 3 = %.4lf 4 = %.4lf",encoder[0]->get_rps(),encoder[1]->get_rps(),encoder[2]->get_rps(),encoder[3]->get_rps());
 
-            printf("fl = %.3lf fr = %.3lf rl = %.3lf rr = %.3lf\n\r",pid[0]->get_pid(),pid[1]->get_pid(),pid[2]->get_pid(),pid[3]->get_pid());
-
             // MD出力
             md[0]->drive(pid[0]->get_pid());
             md[1]->drive(pid[1]->get_pid());
             md[2]->drive(pid[2]->get_pid());
             md[3]->drive(pid[3]->get_pid());
+
+            double current = encoder[1]->get_rotation();
+
+            printf("current = %.4lf target = %.4lf\n\r",current,);
 
 
 
