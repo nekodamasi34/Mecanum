@@ -117,11 +117,11 @@ int main() {
             md[2]->drive(pid[2]->get_pid());
             md[3]->drive(pid[3]->get_pid());
 
-            double current = encoder[1]->get_rotation();
+            double current = encoder[0]->get_rotation();
 
-            printf("current = %.4lf target = %.4lf\n\r",current,);
+//            printf("current = %.4lf  get_pid = %.4lf target = %.4lf\n\r", current, pid[0]->get_pid() ,mw.getSpeed(0));
 
-
+            printf("behind = %.4lf\n\r",pid[0]->get_error_behind());
 
 
             /*
@@ -145,10 +145,10 @@ int main() {
 void initialize_module()
 {
 // PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
-    pid[0] = new PID(1.1, 0, 0);
-    pid[1] = new PID(1.1, 0, 0);
-    pid[2] = new PID(1.1, 0, 0);
-    pid[3] = new PID(1.1, 0, 0);
+    pid[0] = new PID(1.1, 0, 0, 0);
+    pid[1] = new PID(1.1, 0, 0, 1);
+    pid[2] = new PID(1.1, 0, 0, 0);
+    pid[3] = new PID(1.1, 0, 0, 1);
 
 // エンコーダーの制御ピン (a, b)
     encoder[0] = new Encoder(PB_2, PA_11);
