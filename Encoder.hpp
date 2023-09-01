@@ -27,7 +27,7 @@ private:
         if(encoder_b.read()){
             count++;
             rotate = 0;
-        }else if(encoder_b.read()){
+        }else if(!encoder_b.read()){
             count--;
             rotate = 1;
         };
@@ -38,7 +38,7 @@ private:
         if(encoder_a.read()){
             count++;
             rotate = 0;
-        }else if(encoder_b.read()){
+        }else if(!encoder_b.read()){
             count--;
             rotate = 1;
         };
@@ -49,7 +49,7 @@ private:
         if(encoder_b.read()){
             count++;
             rotate = 0;
-        }else if(encoder_b.read()){
+        }else if(!encoder_b.read()){
             count--;
             rotate = 1;
         };
@@ -60,7 +60,7 @@ private:
         if(encoder_a.read()){
             count++;
             rotate = 0;
-        }else if(encoder_a.read()){
+        }else if(!encoder_a.read()){
             count--;
             rotate = 1;
         };
