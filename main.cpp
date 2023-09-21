@@ -104,14 +104,15 @@ int main() {
 
 
             // PID制御
-            pid[0]->control(encoder[0]->get_rps(), mw.getSpeed(0), DELTA_T);
-            pid[1]->control(encoder[1]->get_rps(), mw.getSpeed(1), DELTA_T);
-            pid[2]->control(encoder[2]->get_rps(), mw.getSpeed(2), DELTA_T);
-            pid[3]->control(encoder[3]->get_rps(), mw.getSpeed(3), DELTA_T);
+            pid[0]->control(encoder[0]->get_rps(DELTA_T), mw.getSpeed(0), DELTA_T);
+            pid[1]->control(encoder[1]->get_rps(DELTA_T), mw.getSpeed(1), DELTA_T);
+            pid[2]->control(encoder[2]->get_rps(DELTA_T), mw.getSpeed(2), DELTA_T);
+            pid[3]->control(encoder[3]->get_rps(DELTA_T), mw.getSpeed(3), DELTA_T);
 
             // printf("1 = %.4lf 2 = %.4lf 3 = %.4lf 4 = %.4lf",encoder[0]->get_rps(),encoder[1]->get_rps(),encoder[2]->get_rps(),encoder[3]->get_rps());
 
             // MD出力
+
             md[0]->drive(pid[0]->get_pid());
             md[1]->drive(pid[1]->get_pid());
             md[2]->drive(pid[2]->get_pid());
@@ -119,9 +120,9 @@ int main() {
 
             double current = encoder[0]->get_rotation();
 
-//            printf("current = %.4lf  get_pid = %.4lf target = %.4lf\n\r", current, pid[0]->get_pid() ,mw.getSpeed(0));
+            // printf("current = %.4lf  get_pid = %.4lf target = %.4lf\n\r", current, pid[0]->get_pid() ,mw.getSpeed(0));
 
-            printf("behind = %.4lf\n\r",pid[0]->get_error_behind());
+            // printf("behind = %.4lf\n\r",pid[1]->get_error_behind());
 
 
             /*
@@ -131,10 +132,20 @@ int main() {
             md[3]->drive(mw.getSpeed(3));
             */
 
+
+            /*
+            md[0]->drive(0.4);
+            md[1]->drive(0.4);
+            md[2]->drive(0.4);
+            md[3]->drive(0.4);
+            */
+
             pre_timer = (double)timer.read();
 
             // 周期調整用 (ここを変えるならDELTA_Tも変える)
             ThisThread::sleep_for(10ms);
+
+
 
 
 
@@ -145,10 +156,10 @@ int main() {
 void initialize_module()
 {
 // PIDゲイン調整 {kp(比例), ki(積分), kd(微分)}
-    pid[0] = new PID(1.1, 0, 0, 0);
-    pid[1] = new PID(1.1, 0, 0, 1);
-    pid[2] = new PID(1.1, 0, 0, 0);
-    pid[3] = new PID(1.1, 0, 0, 1);
+    pid[0] = new PID(1.1, 0, 0, 1);
+    pid[1] = new PID(1.1, 0, 0, 0);
+    pid[2] = new PID(1.1, 0, 0, 1);
+    pid[3] = new PID(1.1, 0, 0, 0);
 
 // エンコーダーの制御ピン (a, b)
     encoder[0] = new Encoder(PB_2, PA_11);
@@ -157,10 +168,11 @@ void initialize_module()
     encoder[3] = new Encoder(PA_6, PC_9);
 
 // MDの制御ピン (pwmピン, dirピン, 逆転モード)
-    md[0] = new MD(PA_10, PD_2,  0);
-    md[1] = new MD(PB_3 , PC_11, 1);
-    md[2] = new MD(PB_5 , PC_10, 0);
-    md[3] = new MD(PB_4 , PC_12, 1);
+
+    md[0] = new MD(PA_10, PD_2,  1);
+    md[1] = new MD(PB_3 , PC_11, 0);
+    md[2] = new MD(PB_5 , PC_10, 1);
+    md[3] = new MD(PB_4 , PC_12, 0);
 
 }
 
